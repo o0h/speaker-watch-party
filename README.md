@@ -43,19 +43,13 @@ make up -d
 
 管理画面でSpeakerDeckからダウンロードしたPDFをアップロードします。
 
-`http://localhost/admin.html`（本番は `https://example.com/admin.html`）
+`http://localhost/admin`（本番は `https://example.com/admin`）
 
 「API トークン」欄に `.env` の `API_TOKEN` を入力してアップロードしてください。
 
 ### 4. AppleScriptの設定
 
-`keynote_sync.applescript` の `API_BASE` を環境に合わせて変更します。
-
-```applescript
-property API_BASE : "http://localhost"   -- 本番の場合は https://example.com
-```
-
-ローカルで使う場合はデフォルトのままで動作します。
+`keynote_sync.applescript` はデフォルトで `.env` の `DOMAIN` を読み取り接続先を自動設定します。ローカルで使う場合は `DOMAIN=` を空欄にしてください。
 
 ---
 
@@ -64,7 +58,7 @@ property API_BASE : "http://localhost"   -- 本番の場合は https://example.c
 ### 起動順序
 
 1. `make up -d`（サーバー起動）
-2. `http://localhost/admin.html` でPDFをアップロード
+2. `http://localhost/admin` でPDFをアップロード
 3. 参加者URL（`http://localhost/`）をブラウザで開く
 4. Keynoteでプレゼンファイルを開いてスライドショーを開始
 5. AppleScriptを起動
@@ -109,10 +103,9 @@ CaddyがLet's Encryptで自動的にHTTPS証明書を取得・更新します。
 
 ### docker run を使う場合
 
-`.env` ファイルなしで環境変数を直接注入できます。
-
 ```bash
 docker run -d \
+  --name speaker-watch-party \
   -e SERVER_NAME=example.com \
   -e SPEAKERDECK_URL=https://speakerdeck.com/yourname/your-talk \
   -e API_TOKEN=your-secret-token \
@@ -121,9 +114,23 @@ docker run -d \
   -e TWEET_HASHTAGS=phperkaigi,a \
   -p 80:80 -p 443:443 -p 443:443/udp \
   -v /path/to/data:/app/data \
-  speaker-watch-party-app
+  --restart unless-stopped \
+  o0ho0h/speaker-watch-party:latest
 ```
 
+### admin封鎖
+
+発表中に管理画面へのアクセスを封鎖できます。
+
+```bash
+# 封鎖
+touch /opt/speaker-watch-party/data/.lock
+
+# 解除
+rm /opt/speaker-watch-party/data/.lock
+```
+
+`.lock` ファイルが存在する間、`/admin` は404になります。
 
 ---
 
@@ -166,6 +173,9 @@ speaker-watch-party/
 ├── .env.example                  # 環境変数テンプレート
 ├── Makefile
 ├── keynote_sync.applescript      # 発表者側スクリプト（Mac）
+├── .github/
+│   └── workflows/
+│       └── docker-publish.yml    # Docker Hub自動push
 ├── .runtime/
 │   ├── Dockerfile
 │   ├── Caddyfile

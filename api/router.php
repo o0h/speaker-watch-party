@@ -14,6 +14,19 @@ return function () use (&$currentSlide, &$presenting, $stateFile): void {
 
     header('Content-Type: application/json');
 
+    // GET /admin.html
+    if ($method === 'GET' && $path === '/admin') {
+        $lockFile = dirname(__DIR__) . '/data/.lock';
+        if (file_exists($lockFile)) {
+            http_response_code(404);
+            echo json_encode(['error' => 'Not found']);
+            return;
+        }
+        header('Content-Type: text/html; charset=UTF-8');
+        readfile(dirname(__DIR__) . '/public/admin.html');
+        return;
+    }
+
     // POST /api/slide/:n
     if ($method === 'POST' && preg_match('#^/api/slide/(\d+)$#', $path, $m)) {
         if (!Auth::verify()) {

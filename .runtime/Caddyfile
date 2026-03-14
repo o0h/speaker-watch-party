@@ -21,6 +21,14 @@
             }
         }
 
+        handle /admin {
+            root * {$APP_ROOT:/app}
+            rewrite * /api/worker.php
+            php_server {
+                worker {$APP_ROOT:/app}/api/worker.php 1
+            }
+        }
+
         handle /slide.pdf {
             root * {$APP_ROOT:/app}/data
             file_server
