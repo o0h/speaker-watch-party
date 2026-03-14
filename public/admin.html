@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin – Speaker Watch Party</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #1a1a1a; color: #fff; font-family: sans-serif; padding: 32px; }
+    h1 { font-size: 18px; margin-bottom: 24px; color: #ccc; }
+    section { background: #222; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+    h2 { font-size: 14px; color: #aaa; margin-bottom: 16px; }
+    label { display: block; font-size: 13px; color: #aaa; margin-bottom: 6px; }
+    input[type="text"], input[type="password"], input[type="file"] {
+      width: 100%; padding: 8px 10px; background: #333; border: 1px solid #444;
+      border-radius: 4px; color: #fff; font-size: 13px; margin-bottom: 12px;
+    }
+    button {
+      padding: 8px 18px; background: #4a7fcb; border: none; border-radius: 4px;
+      color: #fff; font-size: 13px; cursor: pointer;
+    }
+    button:hover { background: #5a8fdb; }
+    #upload-result, #slide-result { margin-top: 12px; font-size: 13px; }
+    .ok { color: #6be06b; }
+    .err { color: #e06b6b; }
+  </style>
+</head>
+<body>
+  <h1>Speaker Watch Party – Admin</h1>
+
+  <section>
+    <h2>PDF アップロード</h2>
+    <label>API トークン</label>
+    <input type="password" id="token" placeholder="API_TOKEN">
+    <label>PDF ファイル</label>
+    <input type="file" id="pdf-file" accept="application/pdf,.pdf">
+    <button id="upload-btn">アップロード</button>
+    <div id="upload-result"></div>
+  </section>
+
+  <section>
+    <h2>スライド操作</h2>
+    <label>スライド番号</label>
+    <input type="text" id="slide-num" placeholder="1">
+    <button id="slide-btn">送信</button>
+    <div id="slide-result"></div>
+  </section>
+
+  <script>
+    const tokenEl = document.getElementById('token');
+
+    document.getElementById('upload-btn').addEventListener('click', async () => {
+      const result = document.getElementById('upload-result');
+      const file = document.getElementById('pdf-file').files[0];
+      if (!file) { result.textContent = 'ファイルを選択してください'; result.className = 'err'; return; }
+      const form = new FormData();
+      form.append('pdf', file);
+      result.textContent = 'アップロード中…';
+      result.className = '';
+      try {
+        const res = await fetch('/api/upload-pdf', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${tokenEl.value}` },
+          body: form,
+        });
+        const json = await res.json();
+        if (json.ok) { result.textContent = '完了'; result.className = 'ok'; }
+        else { result.textContent = json.error; result.className = 'err'; }
+      } catch (e) {
+        result.textContent = e.message; result.className = 'err';
+      }
+    });
+
+    document.getElementById('slide-btn').addEventListener('click', async () => {
+      const result = document.getElementById('slide-result');
+      const n = document.getElementById('slide-num').value;
+      try {
+        const res = await fetch(`/api/slide/${n}`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${tokenEl.value}` },
+        });
+        const json = await res.json();
+        result.textContent = JSON.stringify(json);
+        result.className = res.ok ? 'ok' : 'err';
+      } catch (e) {
+        result.textContent = e.message; result.className = 'err';
+      }
+    });
+  </script>
+</body>
+</html>

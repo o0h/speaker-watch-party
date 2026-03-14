@@ -1,0 +1,23 @@
+services:
+  app:
+    container_name: speaker-watch-party
+    build:
+      context: ..
+      dockerfile: .runtime/Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"  # HTTP/3
+    env_file:
+      - path: ../.env
+        required: false
+    environment:
+      SERVER_NAME: ${DOMAIN:-http://}
+      SPEAKERDECK_URL: ${SPEAKERDECK_URL:-}
+      API_TOKEN: ${API_TOKEN:-}
+      MERCURE_JWT_SECRET: ${MERCURE_JWT_SECRET:-}
+      SLIDE_OFFSET: ${SLIDE_OFFSET:-0}
+      TWEET_HASHTAGS: ${TWEET_HASHTAGS:-}
+    volumes:
+      - ../data:/app/data
+    restart: unless-stopped

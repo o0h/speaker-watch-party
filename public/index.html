@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Speaker Watch Party</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #1a1a1a;
+      color: #fff;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      height: 100dvh;
+    }
+
+    #viewer-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    #pdf-canvas {
+      max-width: 100%;
+      max-height: 100%;
+      display: block;
+    }
+
+    #footer {
+      padding: 8px 16px;
+      background: #111;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    #left-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .nav-btn {
+      background: none;
+      border: 1px solid #444;
+      color: #ccc;
+      border-radius: 4px;
+      width: 28px;
+      height: 28px;
+      font-size: 16px;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .nav-btn:hover:not(:disabled) { background: #333; }
+    .nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+    #slide-info {
+      color: #ccc;
+      white-space: nowrap;
+      min-width: 52px;
+      text-align: center;
+    }
+
+    #permalink {
+      color: #7db3ff;
+      text-decoration: none;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    #permalink:hover { text-decoration: underline; }
+
+    #tweet-btn {
+      color: #fff;
+      background: #000;
+      border: 1px solid #555;
+      border-radius: 4px;
+      padding: 3px 10px;
+      text-decoration: none;
+      font-size: 12px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    #tweet-btn:hover { background: #222; }
+
+    #right-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    #resume-btn {
+      background: #fff;
+      color: #111;
+      border: none;
+      border-radius: 3px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    #resume-btn:hover { background: #ddd; }
+
+    #live-badge {
+      padding: 3px 7px;
+      border-radius: 3px;
+      font-size: 12px;
+      font-weight: bold;
+      white-space: nowrap;
+      user-select: none;
+    }
+    #live-badge.live     { background: #f00; color: #fff; cursor: pointer; }
+    #live-badge.desynced { background: #444; color: #999; cursor: pointer; }
+    #live-badge.hidden   { display: none; }
+
+    #status {
+      color: #666;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+  <div id="viewer-wrap">
+    <canvas id="pdf-canvas"></canvas>
+  </div>
+  <footer id="footer">
+    <div id="left-controls">
+      <button id="prev-btn" class="nav-btn" disabled>‹</button>
+      <span id="slide-info">— / —</span>
+      <button id="next-btn" class="nav-btn" disabled>›</button>
+    </div>
+    <a id="permalink" href="#" target="_blank" rel="noopener">SpeakerDeck</a>
+    <a id="tweet-btn" href="#" target="_blank" rel="noopener noreferrer">𝕏 ポスト</a>
+    <div id="right-controls">
+      <button id="resume-btn" hidden>ライブに戻る ▶</button>
+      <div id="live-badge" class="hidden">● LIVE</div>
+      <span id="status">接続中…</span>
+    </div>
+  </footer>
+
+  <script type="module" src="/assets/viewer.js"></script>
+</body>
+</html>

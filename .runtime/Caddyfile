@@ -1,0 +1,33 @@
+{
+    order php_server before file_server
+    order mercure before php_server
+}
+
+{$SERVER_NAME:http://} {
+    root * /app/public
+
+    route {
+        mercure {
+            publisher_jwt {env.MERCURE_JWT_SECRET}
+            subscriber_jwt {env.MERCURE_JWT_SECRET}
+            anonymous
+        }
+
+        handle /api/* {
+            root * /app
+            rewrite * /api/worker.php
+            php_server {
+                worker /app/api/worker.php 1
+            }
+        }
+
+        handle /slide.pdf {
+            root * /app/data
+            file_server
+        }
+
+        handle {
+            file_server
+        }
+    }
+}
