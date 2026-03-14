@@ -5,10 +5,10 @@
 property API_BASE : "http://localhost"
 property POLL_INTERVAL : 0.1 -- 秒
 
-on readEnvToken()
+on readEnv(key)
 	set scriptDir to do shell script "dirname " & quoted form of POSIX path of (path to me)
-	return do shell script "grep '^API_TOKEN=' " & quoted form of (scriptDir & "/.env") & " | cut -d= -f2"
-end readEnvToken
+	return do shell script "grep '^" & key & "=' " & quoted form of (scriptDir & "/.env") & " | cut -d= -f2"
+end readEnv
 
 on log_msg(msg)
 	set t to do shell script "date '+%H:%M:%S'"
@@ -27,7 +27,11 @@ on postStop(token)
 end postStop
 
 -- メインループ
-set API_TOKEN to my readEnvToken()
+set API_TOKEN to my readEnv("API_TOKEN")
+set envDomain to my readEnv("DOMAIN")
+if envDomain is not "" then
+	set API_BASE to "https://" & envDomain
+end if
 my log_msg("起動しました (API: " & API_BASE & ")")
 my log_msg("Keynoteのスライドショー開始を待機中...")
 
@@ -38,8 +42,11 @@ repeat
 		tell application "Keynote"
 			if it is running and (count of documents) > 0 then
 				if playing then
-					set currentSlide to slide number of current slide of front document
-					if currentSlide is not lastSlide then
+					set currentSlide to 0
+					try
+						set currentSlide to slide number of current slide of front document
+					end try
+					if currentSlide is not 0 and currentSlide is not lastSlide then
 						my log_msg("スライド変更: " & lastSlide & " → " & currentSlide)
 						my postSlide(currentSlide, API_TOKEN)
 						set lastSlide to currentSlide
