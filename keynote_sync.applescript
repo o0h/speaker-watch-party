@@ -18,7 +18,7 @@ end log_msg
 on postSlide(slideNumber, token)
 	set cmd to "curl -sk -X POST " & API_BASE & "/api/slide/" & slideNumber & space & "-H 'Authorization: Bearer " & token & "'" & space & "-w '\\n%{http_code}'" & space & "-o /tmp/swp_response.txt 2>&1; echo $(cat /tmp/swp_response.txt)"
 	set result to do shell script cmd
-	my log_msg("POST /api/slide/" & slideNumber & " → " & result)
+	my log_msg("POST /api/slide/" & slideNumber & " -> " & result)
 end postSlide
 
 on postStop(token)
@@ -36,6 +36,8 @@ my log_msg("起動しました (API: " & API_BASE & ")")
 my log_msg("Keynoteのスライドショー開始を待機中...")
 
 set lastSlide to 0
+set lastReactionCount to 0
+set pollCounter to 0
 
 repeat
 	try
@@ -47,7 +49,7 @@ repeat
 						set currentSlide to slide number of current slide of front document
 					end try
 					if currentSlide is not 0 and currentSlide is not lastSlide then
-						my log_msg("スライド変更: " & lastSlide & " → " & currentSlide)
+						my log_msg("スライド変更: " & lastSlide & " -> " & currentSlide)
 						my postSlide(currentSlide, API_TOKEN)
 						set lastSlide to currentSlide
 					end if
@@ -69,6 +71,23 @@ repeat
 	on error errMsg
 		my log_msg("エラー: " & errMsg)
 	end try
+
+	set pollCounter to pollCounter + 1
+	if pollCounter mod 10 = 0 then
+		try
+			set stateJson to do shell script "curl -sk " & API_BASE & "/api/state"
+			set reactionCount to (do shell script "echo " & quoted form of stateJson & " | python3 -c \"import sys,json; print(json.load(sys.stdin).get('reaction_count', 0))\"") as integer
+			if reactionCount > lastReactionCount then
+				set delta to reactionCount - lastReactionCount
+				set pasta to ""
+				repeat delta times
+					set pasta to pasta & "🍝"
+				end repeat
+				display notification pasta with title "夢の無限スパゲッティ製造機" subtitle "" sound name ""
+				set lastReactionCount to reactionCount
+			end if
+		end try
+	end if
 
 	delay POLL_INTERVAL
 end repeat
