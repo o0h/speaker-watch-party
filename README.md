@@ -25,7 +25,7 @@ cp .env.example .env
 `.env` を編集します。
 
 | 変数 | 説明 | 例 |
-|------|------|----|
+|------|------|-----|
 | `SPEAKERDECK_URL` | 発表スライドのSpeakerDeck URL | `https://speakerdeck.com/yourname/your-talk` |
 | `API_TOKEN` | AppleScript・管理画面の認証トークン | `ランダムな文字列` |
 | `MERCURE_JWT_SECRET` | Mercure Hubの署名シークレット | `ランダムな文字列` |
@@ -124,6 +124,7 @@ docker run -d \
   speaker-watch-party-app
 ```
 
+
 ---
 
 ## SLIDE_OFFSET について
@@ -168,7 +169,8 @@ speaker-watch-party/
 ├── .runtime/
 │   ├── Dockerfile
 │   ├── Caddyfile
-│   └── compose.yml
+│   ├── compose.yml
+│   └── uploads.ini               # PHPアップロード設定
 ├── api/
 │   ├── worker.php                # FrankenPHP Workerエントリポイント
 │   ├── router.php

@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 class FetchPdfHandler
 {
-    private const PDF_PATH = '/app/data/slide.pdf';
+    private static function pdfPath(): string
+    {
+        return dirname(__DIR__, 2) . '/data/slide.pdf';
+    }
 
     public static function handle(): void
     {
@@ -28,7 +31,7 @@ class FetchPdfHandler
 
         // PDF をダウンロード
         $pdfUrl = "https://files.speakerdeck.com/presentations/{$dataId}/{$slug}.pdf";
-        $ok = self::downloadFile($pdfUrl, self::PDF_PATH);
+        $ok = self::downloadFile($pdfUrl, self::pdfPath());
         if (!$ok) {
             http_response_code(500);
             echo json_encode(['ok' => false, 'error' => 'Failed to download PDF']);

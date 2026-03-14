@@ -3,7 +3,7 @@
 -- 起動: osascript keynote_sync.applescript
 
 property API_BASE : "http://localhost"
-property POLL_INTERVAL : 1 -- 秒
+property POLL_INTERVAL : 0.1 -- 秒
 
 on readEnvToken()
 	set scriptDir to do shell script "dirname " & quoted form of POSIX path of (path to me)

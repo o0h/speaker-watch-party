@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 class UploadPdfHandler
 {
-    private const PDF_PATH = '/app/data/slide.pdf';
-
     public static function handle(): void
     {
+        $pdfPath = dirname(__DIR__, 2) . '/data/slide.pdf';
+
         $file = $_FILES['pdf'] ?? null;
         if ($file === null || $file['error'] !== UPLOAD_ERR_OK) {
             http_response_code(400);
@@ -21,7 +21,7 @@ class UploadPdfHandler
             return;
         }
 
-        if (!move_uploaded_file($file['tmp_name'], self::PDF_PATH)) {
+        if (!move_uploaded_file($file['tmp_name'], $pdfPath)) {
             http_response_code(500);
             echo json_encode(['ok' => false, 'error' => 'Failed to save file']);
             return;

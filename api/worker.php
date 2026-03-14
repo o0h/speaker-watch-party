@@ -5,7 +5,7 @@ declare(strict_types=1);
 // Worker起動時の共有状態（リクエスト間で保持される）
 $currentSlide  = 1;
 $presenting    = false;
-$stateFile     = '/app/data/.presenting';
+$stateFile     = dirname(__DIR__) . '/data/.presenting';
 
 if (file_exists($stateFile)) {
     $data          = json_decode(file_get_contents($stateFile), true) ?? [];
